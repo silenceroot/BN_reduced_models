@@ -99,3 +99,15 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+
+
+# ======================user-defined====================
+
+# Data in
+*.csv
+
+# Text Backup
+*.*~
+*.#*
+*#
