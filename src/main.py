@@ -19,7 +19,6 @@ while True:
     except:
             pass
 import os
-import sys
 src_path=os.getcwd()
 while True:
     data_in_folder=input('Enter the input folder name:')
@@ -30,10 +29,11 @@ while True:
     except:
             pass
 os.chdir(data_in_path)
+#Generate initial data
 if os.path.exists('./value_start.py'):
-    with open('value_start.py','r') as f:
-        exec(f.read())
-        
+    os.system("python3 value_start.py")
+
+import sys      
 import pandas as pd
 conf = pd.read_table('./config.txt',header = None, comment='#',names=['idx','value'],index_col='idx')
 if conf.index.is_unique==False:
@@ -61,18 +61,64 @@ phi_a= (pd.read_table('./PHI_a.csv',header = None).dropna(axis=1)).values
 z_a  = (pd.read_table('./Z_a.csv',  header = None).dropna(axis=1)).values
 name=locals()
 for flu_var in ['rho','u','v','p','phi_a','z_a']:
-    if (len(name[flu_var][0])!=num_x or len(name[flu_var])!=num_y):
-        print("Rows or columns number of ",flu_var," is incorrect!")
-        sys.exit(1)    
+    if (len(name[flu_var][0])!=num_x):
+        print("Columns number of ",flu_var," is incorrect!")
+        sys.exit(1)
+    elif (len(name[flu_var])!=num_y):
+        print("Rows number of ",flu_var," is incorrect!")
+        sys.exit(1) 
 os.chdir(src_path)
 
 
 '''
 FINITE VOLUME SCHEME
 '''
+t=0.0
+phi_b=1-phi_a
+z_b=1-z_a
+U_rho_a=phi_a*rho
+U_rho_b=phi_b*rho
+U_u=rho*u
+U_e_a=phi_a*rho*u**2+z_a*p/(gamma_a-1)
+U_e_b=phi_b*rho*u**2+z_b*p/(gamma_b-1)
 import numpy as np
-
-
+F_L=np.zeros((num_y,num_x+1))
+F_R=np.zeros((num_y,num_x+1))
+G_L=np.zeros((num_y+1,num_x))
+G_R=np.zeros((num_y+1,num_x))
+U_x_int=np.zeros((num_y,num_x+1))
+U_y_int=np.zeros((num_y+1,num_x))
+dx_U=np.zeros((num_y,num_x))
+dy_u=np.zeros((num_y,num_x))
+#Godunov-type Method
+"""
+import math
+while t<t_all and not (math.isinf(t) or math.isnan(t)):
+    #reconstruction (minmod limiter)
+    for i in range(num_x):
+        dx_U=minmod()/d_x
+    for i in range(num_y):
+        dy_U=minmod()/d_y
+    #CFL condition
+    for i in range(num_x*num_y):
+        a=math.sqrt(gamma_a*p/rho)
+    Smax=max(abs(u)+a)
+    d_t=CFL*d_x/Smax;
+    if t+d_t >= t_all:
+        d_t = t_all-t+0.01*eps
+    #Riemann Reoblem:compute flux
+    for i in range(num_x+1):
+       [F_L,F_R,U_x_int]=GRP_solver_HLLC(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a,d_t)
+    for i in range(num_y+1):
+       [G_L,G_R,U_y_int]=GRP_solver_HLLC(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a,d_t)       
+    #compute U in next step
+    for i in range(num_x):
+        U_rho_a=U_rho_a+d_t/d_x*(F_R-F_L)
+    for i in range(num_y):
+        U_rho_a=U_rho_a+d_t/d_y*(G_R-G_L)
+    [rho,u,v,p,z_a]=primitive_comp(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a)
+    t=t+d_t
+"""
 
 
 '''
