@@ -91,8 +91,10 @@ U_y_int=np.zeros((num_y+1,num_x))
 dx_U=np.zeros((num_y,num_x))
 dy_u=np.zeros((num_y,num_x))
 #Godunov-type Method
-"""
 import math
+from finite_volume import minmod, cons2prim, prim2cons, GRP_solver_HLLC
+U_rho_a,U_rho_b,U_u,U_e_a,U_e_b=cons2prim(rho,p,u,v,z_a,phi_a)
+"""
 while t<t_all and not (math.isinf(t) or math.isnan(t)):
     #reconstruction (minmod limiter)
     for i in range(num_x):
@@ -108,18 +110,15 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
         d_t = t_all-t+0.01*eps
     #Riemann Reoblem:compute flux
     for i in range(num_x+1):
-       [F_L,F_R,U_x_int]=GRP_solver_HLLC(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a,d_t)
+        F_L,F_R,U_x_int=GRP_solver_HLLC(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a,d_t)
     for i in range(num_y+1):
-       [G_L,G_R,U_y_int]=GRP_solver_HLLC(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a,d_t)       
+        G_L,G_R,U_y_int=GRP_solver_HLLC(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a,d_t)       
     #compute U in next step
-    for i in range(num_x):
-        U_rho_a=U_rho_a+d_t/d_x*(F_R-F_L)
-    for i in range(num_y):
-        U_rho_a=U_rho_a+d_t/d_y*(G_R-G_L)
-    [rho,u,v,p,z_a]=primitive_comp(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a)
+    for i in range(num_x*num_y):
+        U_rho_a=U_rho_a+d_t/d_x*(F_R-F_L)+d_t/d_y*(G_R-G_L)
+    rho,p,u,v,z_a=prim2cons(U_rho_a,U_rho_b,U_u,U_e_a,U_e_b,phi_a)
     t=t+d_t
 """
-
 
 '''
 DATA OUT
