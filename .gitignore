@@ -103,8 +103,13 @@ ENV/
 
 # ======================user-defined====================
 
-# Data in
+# Data in/out
 *.csv
+
+# Plot
+*.vtk
+*.tec
+*.png
 
 # Text Backup
 *.*~

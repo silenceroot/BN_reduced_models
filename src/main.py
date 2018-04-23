@@ -5,6 +5,10 @@ Initial data (read)
 This is a script file to read in initial data.
 """
 
+
+'''
+DATA IN
+'''
 dim = 2
 while True:
     order_str=input("Enter order of the scheme (positive integer < 2):")
@@ -14,23 +18,28 @@ while True:
             break
     except:
             pass
-data_in_folder=input('Enter the input folder name:')
-
 import os
 import sys
 src_path=os.getcwd()
-data_in_path='../data_in/two-dim/'+data_in_folder
-if not os.path.exists(data_in_path):
-    print("No data in path!")
-    sys.exit(2)
+while True:
+    data_in_folder=input('Enter the input folder name:')
+    try:
+        data_in_path='../data_in/two-dim/'+data_in_folder
+        if os.path.exists(data_in_path):
+            break
+    except:
+            pass
 os.chdir(data_in_path)
-import value_start
-
+if os.path.exists('./value_start.py'):
+    with open('value_start.py','r') as f:
+        exec(f.read())
+        
 import pandas as pd
 conf = pd.read_table('./config.txt',header = None, comment='#',names=['idx','value'],index_col='idx')
 if conf.index.is_unique==False:
     print("Configure number is not unique!")
     sys.exit(1)
+global t_all,eps,d_x,d_y
 t_all = conf.get_value(1,'value')
 num_species = int(conf.get_value(2,'value'))
 eps = conf.get_value(4,'value')
@@ -56,8 +65,19 @@ for flu_var in ['rho','u','v','p','phi_a','z_a']:
         print("Rows or columns number of ",flu_var," is incorrect!")
         sys.exit(1)    
 os.chdir(src_path)
+
+
+'''
+FINITE VOLUME SCHEME
+'''
 import numpy as np
 
+
+
+
+'''
+DATA OUT
+'''
 data_out_path='../data_out/two-dim/BNR_'+order_str+'_order/'+data_in_folder
 if not os.path.exists(data_out_path):
     os.makedirs(data_out_path)
@@ -68,4 +88,8 @@ np.savetxt("U.csv",        u,delimiter='\t',fmt='%.8g')
 np.savetxt("V.csv",        v,delimiter='\t',fmt='%.8g')
 np.savetxt("PHI_a.csv",phi_a,delimiter='\t',fmt='%.8g')
 np.savetxt("Z_a.csv",    z_a,delimiter='\t',fmt='%.8g')
+#plot
+if os.path.exists('./value_plot.py'):
+    with open('value_plot.py','r') as f:
+        exec(f.read())
 os.chdir(src_path)
