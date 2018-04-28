@@ -5,32 +5,67 @@ Created on Mon Apr 23 10:45:31 2018
 
 @author: leixin
 """
-
-num_x=640
-num_y=3
-center=num_x//5
-rho_L=2.7647
-rho_R=1
-p_L=4.4468
-p_R=1
-u_L=1.4833
-u_R=0
-v_L=0
-v_R=0
-phi_a_L=0
-phi_a_R=1
-z_a_L=0
-z_a_R=1
 import numpy as np
-rho  =np.hstack((rho_L  *np.ones((num_y,center)),rho_R  *np.ones((num_y,num_x-center))))
-p    =np.hstack((p_L    *np.ones((num_y,center)),p_R    *np.ones((num_y,num_x-center))))
-u    =np.hstack((u_L    *np.ones((num_y,center)),u_R    *np.ones((num_y,num_x-center))))
-v    =np.hstack((v_L    *np.ones((num_y,center)),v_R    *np.ones((num_y,num_x-center))))
-phi_a=np.hstack((phi_a_L*np.ones((num_y,center)),phi_a_R*np.ones((num_y,num_x-center))))
-z_a  =np.hstack((z_a_L  *np.ones((num_y,center)),z_a_R  *np.ones((num_y,num_x-center))))
-np.savetxt("RHO.csv",    rho,delimiter='\t',fmt='%.8g')
-np.savetxt("P.csv",        p,delimiter='\t',fmt='%.8g')
-np.savetxt("U.csv",        u,delimiter='\t',fmt='%.8g')
-np.savetxt("V.csv",        v,delimiter='\t',fmt='%.8g')
-np.savetxt("PHI_a.csv",phi_a,delimiter='\t',fmt='%.8g')
-np.savetxt("Z_a.csv",    z_a,delimiter='\t',fmt='%.8g')
+import pandas as pd
+eps=1e-9
+num_x=3000
+num_y=10000
+center=num_x//5
+rho_a=2.7647
+rho_b=1
+rho_c=2
+p_a=4.4468
+p_b=1
+p_c=2
+u_a=1.4833
+u_b=0
+u_c=0
+v_a=1.4833
+v_b=0
+v_c=0
+
+size_kaikou=1
+N=int(size_kaikou/d_y)
+
+rho=np.ones((num_y,num_x))
+p=np.ones((num_y,num_x))
+u=np.zeros((num_y,num_x))
+v=np.zeros((num_y,num_x))
+phi_a=np.ones((num_y,num_x))
+phi_b=np.ones((num_y,num_x))
+z_a=np.ones((num_y,num_x))
+z_b=np.ones((num_y,num_x))
+
+rho[-N:,:]=rho_c
+rho[:,-N:]=rho_c
+rho[:-N,:-N]=rho_b
+rho[-N-1,0]=rho_a
+
+p[-N:,:]=p_c
+p[:,-N:]=p_c
+p[:-N,:-N]=p_b
+p[-N-1,0]=p_a
+
+u[-N-1,0]=u_a
+v[-N-1,0]=v_a
+
+phi_a=eps*phi_a
+z_a=eps*z_a
+phi_a[-N-1,0]=1-2*eps
+z_a[-N-1,0]=1-2*eps
+
+phi_b=eps*phi_b
+phi_b[:-N,:-N]=1-2*eps
+phi_b[-N-1,0]=eps
+z_b=eps*z_b
+z_b[:-N,:-N]=1-2*eps
+z_b[-N-1,0]=eps
+
+pd.DataFrame(rho).to_csv('RHO.csv',header=False,index=False)
+pd.DataFrame(p).to_csv('P.csv',header=False,index=False)
+pd.DataFrame(u).to_csv('U.csv',header=False,index=False)
+pd.DataFrame(v).to_csv('V.csv',header=False,index=False)
+pd.DataFrame(phi_a).to_csv('PHI_a.csv',header=False,index=False)
+pd.DataFrame(phi_b).to_csv('PHI_b.csv',header=False,index=False)
+pd.DataFrame(z_a).to_csv('Z_a.csv',header=False,index=False)
+pd.DataFrame(z_b).to_csv('Z_b.csv',header=False,index=False)
