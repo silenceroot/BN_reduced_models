@@ -8,19 +8,19 @@ Created on Mon Apr 23 10:45:31 2018
 import numpy as np
 import pandas as pd
 eps=1e-9
-num_x=3000
-num_y=10000
-center=num_x//5
-rho_a=2.7647
+num_x=60
+num_y=200
+d_y=0.1
+rho_a=1
 rho_b=1
-rho_c=2
+rho_c=1
 p_a=4.4468
 p_b=1
-p_c=2
-u_a=1.4833
+p_c=1
+u_a=0
 u_b=0
 u_c=0
-v_a=1.4833
+v_a=0
 v_b=0
 v_c=0
 

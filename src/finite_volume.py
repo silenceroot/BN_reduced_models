@@ -5,9 +5,6 @@ Created on Mon Apr 23 15:41:05 2018
 
 @author: leixin
 """
-import numpy as np
-from EOS import p2e,e2p
-
 def minmod(a,b,c):
     if (c>0 and a>0 and b>0):
         return min(a,b,c);
@@ -23,7 +20,7 @@ def prim2cons(rho,p,u,v,z_a,z_b,phi_a,phi_b):
     U_u=rho*u
     U_v=rho*v
     U_e=p2e(p,rho,phi_a,phi_b,z_a,z_b)
-    U_E=U_e+0.5*(u**2+v**2)
+    U_E=rho*(U_e+0.5*(u**2+v**2))
     U_z_a=z_a
     U_z_b=z_b
     return (U_rho_a,U_rho_b,U_rho_c,U_u,U_v,U_E,U_z_a,U_z_b)
@@ -91,6 +88,3 @@ def R_G2(p,Lambda):
         return G2*np.power(1-Lambda,e)*np.power(Lambda,g)*np.power(p,z)
 def R(rho,p,Lambda,v0_s):
     return R_I(rho,Lambda,v0_s)+R_G1(p,Lambda)+R_G2(p,Lambda)
-
-if __name__=='__main__':
-    print(R(2,12,0.001,1))
