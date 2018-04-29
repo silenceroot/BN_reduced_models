@@ -146,7 +146,7 @@ def Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b):
     z_b_with_boundary=np.vstack((z_b_L_R[0:1,:],z_b_L_R,z_b_L_R[-1:,:]))
         
     u_L_R=np.hstack((-u[:,0:1],u,-u[:,-1:]))
-    u_L_R[N_start:N_start+N,:-1]=-u_L_R[N_start:N_start+N,:-1]
+    u_L_R[N_start:N_start+N,-1:]=-u_L_R[N_start:N_start+N,-1:]
     u_with_boundary=np.vstack((u_L_R[0:1,:],u_L_R,u_L_R[-1:,:]))
     
     v_L_R=np.hstack((v[:,0:1],v,v[:,-1:]))
@@ -189,7 +189,7 @@ def p2e(p,rho,phi_a,phi_b,z_a,z_b):
         e_c=0
     else:
         v=z_c/(rho*phi_c)
-        e_c=p*v/w_c-FF(v,A_c,B_c,R1_c,R2_c,w_c)+FF(v0_b,A_c,B_c,R1_c,R2_c,w_c)+Q_c
+        e_c=p*v/w_c-FF(v,A_c,B_c,R1_c,R2_c,w_c)+FF(v0_c,A_c,B_c,R1_c,R2_c,w_c)+Q_c
     return phi_a*e_a+phi_b*e_b+phi_c*e_c
 
 #内能to压力
@@ -378,11 +378,7 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
             c_sound[i,j]=ComputeOfC(p_with_boundary[i,j],rho_with_boundary[i,j],phi_a_with_boundary[i,j],
                                 phi_b_with_boundary[i,j],z_a_with_boundary[i,j],z_b_with_boundary[i,j])
     Smax=max(np.max(abs(u_with_boundary)+c_sound),np.max(abs(v_with_boundary)+c_sound))
-    print(np.min(p_with_boundary))
-    print(np.min(phi_a_with_boundary))
-    print(np.min(phi_b_with_boundary))
-    print(np.min(z_a_with_boundary))
-    print(np.min(z_b_with_boundary))
+    
     d_t=CFL*d_x/Smax;
     if t+d_t >= t_all:
         d_t = t_all-t+0.01*eps
@@ -426,8 +422,9 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
         G_computer=[]
         for j in range(1,num_x+1):
             G_return,V_return,z_a_return,z_b_return=\
-            GRP_solver_HLLC(U_rho_a[i,j],U_rho_b[i,j],U_rho_c[i,j],U_v[i,j],U_u[i,j],U_E[i,j],z_a_with_boundary[i,j],z_b_with_boundary[i,j],c_sound[i,j],
-                            U_rho_a[i+1,j],U_rho_b[i+1,j],U_rho_c[i+1,j],U_v[i+1,j],U_u[i+1,j],U_E[i+1,j],z_a_with_boundary[i+1,j],z_b_with_boundary[i+1,j],c_sound[i+1,j])
+            GRP_solver_HLLC(U_rho_a[i+1,j],U_rho_b[i+1,j],U_rho_c[i+1,j],U_v[i+1,j],-U_u[i+1,j],U_E[i+1,j],z_a_with_boundary[i+1,j],z_b_with_boundary[i+1,j],c_sound[i+1,j],
+                            U_rho_a[i,j],U_rho_b[i,j],U_rho_c[i,j],U_v[i,j],-U_u[i,j],U_E[i,j],z_a_with_boundary[i,j],z_b_with_boundary[i,j],c_sound[i,j])
+            G_return[3],G_return[4]=G_return[4],G_return[3]
             G_computer.append(G_return)
             V_flux[i,j-1]=V_return
             z_a_y_flux[i,j-1]=z_a_return
@@ -440,7 +437,7 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
             U_i_j=np.array([U_rho_a[i+1,j+1],U_rho_b[i+1,j+1],U_rho_c[i+1,j+1],U_u[i+1,j+1],U_v[i+1,j+1],U_E[i+1,j+1]])      #n时刻守恒量值
             R_sourse_array=np.array([R_sourse[i,j],0,0,0,0,0])
             U_i_j=U_i_j-d_t/d_x*(F[i][j+1]-F[i][j])-d_t/d_y*(G[i][j]-G[i+1][j])+d_t*R_sourse_array                          #更新下一步
-            Return=cons2prim(U_i_j[0],U_i_j[1],U_i_j[2],U_i_j[3],U_i_j[4],U_i_j[5],0,0)
+            Return=cons2prim(U_i_j[0],U_i_j[1],U_i_j[2],U_i_j[3],U_i_j[4],U_i_j[5],z_a[i,j],z_b[i,j])
             rho[i,j]=Return[0]
             p[i,j]=Return[1]
             u[i,j]=Return[2]
@@ -470,6 +467,8 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
     phi_a_with_boundary,z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary=\
     Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b)
     
+    
+    
     silence=0
     if np.isnan(rho).any():
         print('rho')
@@ -498,7 +497,6 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
     if silence==1:
         break
     t=t+d_t
-
 
 '''
 DATA OUT
