@@ -6,7 +6,7 @@ Created on Thu Apr 26 19:52:16 2018
 """
 import numpy as np
 from scipy.linalg import solve
-eps=1e-8
+epss=1e-8
 #Mie-Gruneisen EOS 中的F函数
 def F(v,A,B,R1,R2,w):
     if A==0 and B==0:
@@ -23,19 +23,19 @@ def Z(v,A,B,R1,R2,w):
 
 #压力to内能
 def p2e(p,rho,phi_a,phi_b,z_a,z_b):
-    if z_a<eps or phi_a<eps:
+    if z_a<epss or phi_a<epss:
         e_a=0
     else:
         v=z_a/(rho*phi_a)
         e_a=p*v/w_a-F(v,A_a,B_a,R1_a,R2_a,w_a)+F(v0_a,A_a,B_a,R1_a,R2_a,w_a)+Q_a
-    if z_b<eps or phi_b<eps:
+    if z_b<epss or phi_b<epss:
         e_b=0
     else:
         v=z_b/(rho*phi_b)
         e_b=p*v/w_b-F(v,A_b,B_b,R1_b,R2_b,w_b)+F(v0_b,A_b,B_b,R1_b,R2_b,w_b)+Q_b
     z_c=1-z_a-z_b
     phi_c=1-phi_a-phi_b
-    if z_c<eps or phi_c<eps:
+    if z_c<epss or phi_c<epss:
         e_c=0
     else:
         v=z_c/(rho*phi_c)
@@ -46,11 +46,11 @@ def p2e(p,rho,phi_a,phi_b,z_a,z_b):
 def e2p(e,rho,phi_a,phi_b,z_a,z_b):
     z_c=1-z_a-z_b
     phi_c=1-phi_a-phi_b
-    if z_a<eps or phi_a<eps:
-        if z_b<eps or phi_b<eps:
+    if z_a<epss or phi_a<epss:
+        if z_b<epss or phi_b<epss:
             v_c=z_c/(rho*phi_c)
             p=w_c/v_c*(e+Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
-        elif z_c<eps or phi_c<eps:
+        elif z_c<epss or phi_c<epss:
             v_b=z_b/(rho*phi_b)
             p=w_b/v_b*(e+Z(v_b,A_b,B_b,R1_b,R2_b,w_b)-Z(v0_b,A_b,B_b,R1_b,R2_b,w_b))
         else:
@@ -60,8 +60,8 @@ def e2p(e,rho,phi_a,phi_b,z_a,z_b):
             C=w_c/v_c*(Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
             p=B+(e-phi_c*(B-C)*v_c/w_c)/(phi_c*v_c/w_c+phi_b*v_b/w_b)
         return p
-    elif z_b<eps or phi_b<eps:
-        if z_c<eps or phi_c<eps:
+    elif z_b<epss or phi_b<epss:
+        if z_c<epss or phi_c<epss:
             v_a=z_a/(rho*phi_a)
             p=w_a/v_a*(e+Z(v_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))
         else:
@@ -71,7 +71,7 @@ def e2p(e,rho,phi_a,phi_b,z_a,z_b):
             C=w_c/v_c*(Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
             p=A+(e-phi_c*(A-C)*v_c/w_c)/(phi_c*v_c/w_c+phi_a*v_a/w_a)
         return p
-    elif z_c<eps or phi_c<eps:
+    elif z_c<epss or phi_c<epss:
         v_b=z_b/(rho*phi_b)
         v_a=z_a/(rho*phi_a)
         A=w_a/v_a*(Z(v_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))
@@ -100,19 +100,19 @@ def ZZ(v,A,B,R1,R2):
 def ComputeOfC(p,rho,phi_a,phi_b,z_a,z_b):
     z_c=1-z_a-z_b
     phi_c=1-phi_a-phi_b
-    if z_a<eps or phi_a<eps:
+    if z_a<epss or phi_a<epss:
         c_a_square=0                                                                   #声速的平方
     else:
         v=z_a/(rho*phi_a)
         e_a=p*v/w_a-F(v,A_a,B_a,R1_a,R2_a,w_a)+F(v0_a,A_a,B_a,R1_a,R2_a,w_a)+Q_a
         c_a_square=w_a*(p*v+e_a-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))+ZZ(v,A_a,B_a,R1_a,R2_a)
-    if z_b<eps or phi_b<eps:
+    if z_b<epss or phi_b<epss:
         c_b_square=0
     else:
         v=z_b/(rho*phi_b)
         e_b=p*v/w_b-F(v,A_b,B_b,R1_b,R2_b,w_b)+F(v0_b,A_b,B_b,R1_b,R2_b,w_b)+Q_b
         c_b_square=w_b*(p*v+e_b-Z(v0_b,A_b,B_b,R1_b,R2_b,w_b))+ZZ(v,A_b,B_b,R1_b,R2_b)
-    if z_c<eps or phi_c<eps:
+    if z_c<epss or phi_c<epss:
         c_c_square=0
     else:
         v=z_c/(rho*phi_c)
@@ -120,5 +120,3 @@ def ComputeOfC(p,rho,phi_a,phi_b,z_a,z_b):
         c_c_square=w_c*(p*v+e_c-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))+ZZ(v,A_c,B_c,R1_c,R2_c)
     c_square=phi_a*c_a_square+phi_b*c_b_square+phi_c*c_c_square                    #混合声速的平方
     return np.sqrt(c_square)                                                       #返回混合声速
-if __name__=='__main__':
-    print(ComputeOfC(12,10,0.1,0.2,0.3,0.2))

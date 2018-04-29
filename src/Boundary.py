@@ -5,6 +5,7 @@ Created on Sat Apr 28 09:57:42 2018
 @author: silence
 """
 import numpy as np
+global d_y
 def Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b):                
     size_kaikou=1                                           #开口大小
     N=int(size_kaikou/d_y)                                  #开口占网格数
