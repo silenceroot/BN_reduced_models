@@ -496,7 +496,30 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
         silence=1
     if silence==1:
         break
-    t=t+d_t
+    t=t+d_t 
+
+#温度场
+Temper=np.zeros((num_y,num_x))
+for i in range(num_y):
+    for j in range(num_x):
+        if z_a[i,j]<eps or phi_a[i,j]<eps:
+            CT_a=0
+        else:
+            v_a=z_a[i,j]/(rho[i,j]*phi_a[i,j])
+            CT_a=p[i,j]*v_a/w_a+Z(v0_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v_a,A_a,B_a,R1_a,R2_a,w_a)
+        if z_b[i,j]<eps or phi_b[i,j]<eps:
+            CT_b=0
+        else:
+            v_b=z_b[i,j]/(rho[i,j]*phi_b[i,j])
+            CT_b=p[i,j]*v_b/w_b+Z(v0_b,A_b,B_b,R1_b,R2_b,w_b)-Z(v_b,A_b,B_b,R1_b,R2_b,w_b)
+        z_c=1-z_a[i,j]-z_b[i,j]
+        phi_c=1-phi_a[i,j]-phi_b[i,j]
+        if z_c<eps or phi_c<eps:
+            CT_c=0
+        else:
+            v_c=z_c/(rho[i,j]*phi_c)
+            CT_c=p[i,j]*v_c/w_c+Z(v0_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v_c,A_c,B_c,R1_c,R2_c,w_c)
+        Temper[i,j]=(phi_a[i,j]*CT_a+phi_b[i,j]*CT_b+phi_c*CT_c)/(phi_a[i,j]*Cv_a+phi_b[i,j]*Cv_b+phi_c*Cv_c)
 '''
 DATA OUT
 '''
@@ -513,7 +536,7 @@ pd.DataFrame(phi_a).to_csv('PHI_a.csv',header=False,index=False)
 pd.DataFrame(phi_b).to_csv('PHI_b.csv',header=False,index=False)
 pd.DataFrame(z_a).to_csv('Z_a.csv',header=False,index=False)
 pd.DataFrame(z_b).to_csv('Z_b.csv',header=False,index=False)
-
+pd.DataFrame(Temper).to_csv('TEMPER.csv',header=False,index=False)
 """
 #plot
 if os.path.exists('./value_plot.py'):
