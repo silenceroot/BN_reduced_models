@@ -154,9 +154,37 @@ def Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b):
 
     return (rho_with_boundary,p_with_boundary,u_with_boundary,v_with_boundary,phi_a_with_boundary,\
             z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary)
+#全部自由边界
+def Free_Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b):                
 
+    rho_L_R=np.hstack((rho[:,0:1],rho,rho[:,-1:]))
+    rho_with_boundary=np.vstack((rho_L_R[0:1,:],rho_L_R,rho_L_R[-1:,:]))
+    
+    p_L_R=np.hstack((p[:,0:1],p,p[:,-1:]))
+    p_with_boundary=np.vstack((p_L_R[0:1,:],p_L_R,p_L_R[-1:,:]))
+    
+    phi_a_L_R=np.hstack((phi_a[:,0:1],phi_a,phi_a[:,-1:]))
+    phi_a_with_boundary=np.vstack((phi_a_L_R[0:1,:],phi_a_L_R,phi_a_L_R[-1:,:]))
+    
+    phi_b_L_R=np.hstack((phi_b[:,0:1],phi_b,phi_b[:,-1:]))
+    phi_b_with_boundary=np.vstack((phi_b_L_R[0:1,:],phi_b_L_R,phi_b_L_R[-1:,:]))
+    
+    z_a_L_R=np.hstack((z_a[:,0:1],z_a,z_a[:,-1:]))
+    z_a_with_boundary=np.vstack((z_a_L_R[0:1,:],z_a_L_R,z_a_L_R[-1:,:]))
+    
+    z_b_L_R=np.hstack((z_b[:,0:1],z_b,z_b[:,-1:]))
+    z_b_with_boundary=np.vstack((z_b_L_R[0:1,:],z_b_L_R,z_b_L_R[-1:,:]))
+        
+    u_L_R=np.hstack((u[:,0:1],u,u[:,-1:]))
+    u_with_boundary=np.vstack((u_L_R[0:1,:],u_L_R,u_L_R[-1:,:]))
+    
+    v_L_R=np.hstack((v[:,0:1],v,v[:,-1:]))
+    v_with_boundary=np.vstack((v_L_R[0:1,:],v_L_R,v_L_R[-1:,:]))
+
+    return (rho_with_boundary,p_with_boundary,u_with_boundary,v_with_boundary,phi_a_with_boundary,\
+            z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary)
 #EOS
-epss=1e-8
+epss=1e-11
 #Mie-Gruneisen EOS 中的F函数
 def FF(f_v,f_A,f_B,f_R1,f_R2,f_w):
     if f_A==0 and f_B==0:
@@ -351,11 +379,15 @@ def R(rho1,p1,Lambda,v0_s):
 *******************************************************************************************************
 '''
 #边界条件
+
 rho_with_boundary,p_with_boundary,u_with_boundary,v_with_boundary,\
 phi_a_with_boundary,z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary=\
 Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b)
-
-
+'''
+rho_with_boundary,p_with_boundary,u_with_boundary,v_with_boundary,\
+phi_a_with_boundary,z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary=\
+Free_Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b)
+'''
 '''
 FINITE VOLUME SCHEME
 '''
@@ -422,8 +454,8 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
         G_computer=[]
         for j in range(1,num_x+1):
             G_return,V_return,z_a_return,z_b_return=\
-            GRP_solver_HLLC(U_rho_a[i+1,j],U_rho_b[i+1,j],U_rho_c[i+1,j],U_v[i+1,j],-U_u[i+1,j],U_E[i+1,j],z_a_with_boundary[i+1,j],z_b_with_boundary[i+1,j],c_sound[i+1,j],
-                            U_rho_a[i,j],U_rho_b[i,j],U_rho_c[i,j],U_v[i,j],-U_u[i,j],U_E[i,j],z_a_with_boundary[i,j],z_b_with_boundary[i,j],c_sound[i,j])
+            GRP_solver_HLLC(U_rho_a[i+1,j],U_rho_b[i+1,j],U_rho_c[i+1,j],U_v[i+1,j],U_u[i+1,j],U_E[i+1,j],z_a_with_boundary[i+1,j],z_b_with_boundary[i+1,j],c_sound[i+1,j],
+                            U_rho_a[i,j],U_rho_b[i,j],U_rho_c[i,j],U_v[i,j],U_u[i,j],U_E[i,j],z_a_with_boundary[i,j],z_b_with_boundary[i,j],c_sound[i,j])
             G_return[3],G_return[4]=G_return[4],G_return[3]
             G_computer.append(G_return)
             V_flux[i,j-1]=V_return
@@ -431,20 +463,7 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
             z_b_y_flux[i,j-1]=z_b_return
         G.append(G_computer)
     #compute U in next step
-    #6个守恒量
-    for i in range(num_y):
-        for j in range(num_x):
-            U_i_j=np.array([U_rho_a[i+1,j+1],U_rho_b[i+1,j+1],U_rho_c[i+1,j+1],U_u[i+1,j+1],U_v[i+1,j+1],U_E[i+1,j+1]])      #n时刻守恒量值
-            R_sourse_array=np.array([R_sourse[i,j],0,0,0,0,0])
-            U_i_j=U_i_j-d_t/d_x*(F[i][j+1]-F[i][j])-d_t/d_y*(G[i][j]-G[i+1][j])+d_t*R_sourse_array                          #更新下一步
-            Return=cons2prim(U_i_j[0],U_i_j[1],U_i_j[2],U_i_j[3],U_i_j[4],U_i_j[5],z_a[i,j],z_b[i,j])
-            rho[i,j]=Return[0]
-            p[i,j]=Return[1]
-            u[i,j]=Return[2]
-            v[i,j]=Return[3]
-            phi_a[i,j]=Return[6]
-            phi_b[i,j]=Return[7]
-    #2个非守恒量
+    #2个非守恒量,先更新，更新守恒量要用到更新后的体积分数
     U_flux_L=U_flux[:,:-1]
     U_flux_R=U_flux[:,1:]
     V_flux_L=V_flux[1:,:]
@@ -462,13 +481,31 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
     z_b=z_b-d_t/d_x*(U_flux_R*z_b_x_flux_R-U_flux_L*z_b_x_flux_L-z_b*(U_flux_R-U_flux_L))\
             -d_t/d_y*(V_flux_R*z_b_y_flux_R-V_flux_L*z_b_y_flux_L-z_b*(V_flux_R-V_flux_L))
             
+    #6个守恒量
+    for i in range(num_y):
+        for j in range(num_x):
+            U_i_j=np.array([U_rho_a[i+1,j+1],U_rho_b[i+1,j+1],U_rho_c[i+1,j+1],U_u[i+1,j+1],U_v[i+1,j+1],U_E[i+1,j+1]])      #n时刻守恒量值
+            R_sourse_array=np.array([R_sourse[i,j],0,0,0,0,0])
+            U_i_j=U_i_j-d_t/d_x*(F[i][j+1]-F[i][j])-d_t/d_y*(G[i][j]-G[i+1][j])+d_t*R_sourse_array                          #更新下一步
+            Return=cons2prim(U_i_j[0],U_i_j[1],U_i_j[2],U_i_j[3],U_i_j[4],U_i_j[5],z_a[i,j],z_b[i,j])
+            rho[i,j]=Return[0]
+            p[i,j]=Return[1]
+            u[i,j]=Return[2]
+            v[i,j]=Return[3]
+            phi_a[i,j]=Return[6]
+            phi_b[i,j]=Return[7]
+    
+            
     #边界条件
+    
     rho_with_boundary,p_with_boundary,u_with_boundary,v_with_boundary,\
     phi_a_with_boundary,z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary=\
     Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b)
-    
-    
-    
+    '''
+    rho_with_boundary,p_with_boundary,u_with_boundary,v_with_boundary,\
+    phi_a_with_boundary,z_a_with_boundary,phi_b_with_boundary,z_b_with_boundary=\
+    Free_Boundary_Condition(rho,p,u,v,phi_a,z_a,phi_b,z_b)
+    '''
     silence=0
     if np.isnan(rho).any():
         print('rho')
@@ -496,7 +533,7 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
         silence=1
     if silence==1:
         break
-    t=t+d_t 
+    t=t+d_t
 
 #温度场
 Temper=np.zeros((num_y,num_x))

@@ -7,7 +7,8 @@ Created on Mon Apr 23 10:45:31 2018
 """
 import numpy as np
 import pandas as pd
-eps=1e-9
+#eps=1e-12
+eps=0
 num_x=60
 num_y=200
 d_y=0.1
@@ -17,13 +18,12 @@ rho_c=1
 p_a=1.92684
 p_b=1
 p_c=1
-u_a=0
-u_b=0
-u_c=0
-v_a=0
-v_b=0
-v_c=0
-
+'''
+#test
+u=0*np.ones((num_y,num_x))
+v=1*np.ones((num_y,num_x))
+#end
+'''
 size_kaikou=1
 N=int(size_kaikou/d_y)
 
