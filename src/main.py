@@ -199,42 +199,42 @@ def e2p(e,rho,phi_a,phi_b,z_a,z_b):
     if z_a<epss or phi_a<epss:
         if z_b<epss or phi_b<epss:
             v_c=z_c/(rho*phi_c)
-            p=w_c/v_c*(e+Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
+            p=w_c/v_c*(e+FF(v_c,A_c,B_c,R1_c,R2_c,w_c)-FF(v0_c,A_c,B_c,R1_c,R2_c,w_c)-Q_c)
         elif z_c<epss or phi_c<epss:
             v_b=z_b/(rho*phi_b)
-            p=w_b/v_b*(e+Z(v_b,A_b,B_b,R1_b,R2_b,w_b)-Z(v0_b,A_b,B_b,R1_b,R2_b,w_b))
+            p=w_b/v_b*(e+FF(v_b,A_b,B_b,R1_b,R2_b,w_b)-FF(v0_b,A_b,B_b,R1_b,R2_b,w_b)-Q_b)
         else:
             v_c=z_c/(rho*phi_c)
             v_b=z_b/(rho*phi_b)
-            B=w_b/v_b*(Z(v_b,A_b,B_b,R1_b,R2_b,w_b)-Z(v0_b,A_b,B_b,R1_b,R2_b,w_b))
-            C=w_c/v_c*(Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
+            B=w_b/v_b*(FF(v_b,A_b,B_b,R1_b,R2_b,w_b)-FF(v0_b,A_b,B_b,R1_b,R2_b,w_b)-Q_b)
+            C=w_c/v_c*(FF(v_c,A_c,B_c,R1_c,R2_c,w_c)-FF(v0_c,A_c,B_c,R1_c,R2_c,w_c)-Q_c)
             p=B+(e-phi_c*(B-C)*v_c/w_c)/(phi_c*v_c/w_c+phi_b*v_b/w_b)
         return p
     elif z_b<epss or phi_b<epss:
         if z_c<epss or phi_c<epss:
             v_a=z_a/(rho*phi_a)
-            p=w_a/v_a*(e+Z(v_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))
+            p=w_a/v_a*(e+FF(v_a,A_a,B_a,R1_a,R2_a,w_a)-FF(v0_a,A_a,B_a,R1_a,R2_a,w_a)-Q_a)
         else:
             v_c=z_c/(rho*phi_c)
             v_a=z_a/(rho*phi_a)
-            A=w_a/v_a*(Z(v_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))
-            C=w_c/v_c*(Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
+            A=w_a/v_a*(FF(v_a,A_a,B_a,R1_a,R2_a,w_a)-FF(v0_a,A_a,B_a,R1_a,R2_a,w_a)-Q_a)
+            C=w_c/v_c*(FF(v_c,A_c,B_c,R1_c,R2_c,w_c)-FF(v0_c,A_c,B_c,R1_c,R2_c,w_c)-Q_c)
             p=A+(e-phi_c*(A-C)*v_c/w_c)/(phi_c*v_c/w_c+phi_a*v_a/w_a)
         return p
     elif z_c<epss or phi_c<epss:
         v_b=z_b/(rho*phi_b)
         v_a=z_a/(rho*phi_a)
-        A=w_a/v_a*(Z(v_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))
-        B=w_b/v_b*(Z(v_b,A_b,B_b,R1_b,R2_b,w_b)-Z(v0_b,A_b,B_b,R1_b,R2_b,w_b))
+        A=w_a/v_a*(FF(v_a,A_a,B_a,R1_a,R2_a,w_a)-FF(v0_a,A_a,B_a,R1_a,R2_a,w_a)-Q_a)
+        B=w_b/v_b*(FF(v_b,A_b,B_b,R1_b,R2_b,w_b)-FF(v0_b,A_b,B_b,R1_b,R2_b,w_b)-Q_b)
         p=A+(e-phi_b*(A-B)*v_b/w_b)/(phi_b*v_b/w_b+phi_a*v_a/w_a)
         return p
     else:
         v_b=z_b/(rho*phi_b)
         v_a=z_a/(rho*phi_a)
         v_c=z_c/(rho*phi_c)
-        A=w_a/v_a*(Z(v_a,A_a,B_a,R1_a,R2_a,w_a)-Z(v0_a,A_a,B_a,R1_a,R2_a,w_a))
-        B=w_b/v_b*(Z(v_b,A_b,B_b,R1_b,R2_b,w_b)-Z(v0_b,A_b,B_b,R1_b,R2_b,w_b))
-        C=w_c/v_c*(Z(v_c,A_c,B_c,R1_c,R2_c,w_c)-Z(v0_c,A_c,B_c,R1_c,R2_c,w_c))
+        A=w_a/v_a*(FF(v_a,A_a,B_a,R1_a,R2_a,w_a)-FF(v0_a,A_a,B_a,R1_a,R2_a,w_a)-Q_a)
+        B=w_b/v_b*(FF(v_b,A_b,B_b,R1_b,R2_b,w_b)-FF(v0_b,A_b,B_b,R1_b,R2_b,w_b)-Q_b)
+        C=w_c/v_c*(FF(v_c,A_c,B_c,R1_c,R2_c,w_c)-FF(v0_c,A_c,B_c,R1_c,R2_c,w_c)-Q_c)
         aa=np.array([[phi_a,phi_b,phi_c],[w_a/v_a,-w_b/v_b,0],[w_a/v_a,0,-w_c/v_c]])
         bb=np.array([e,B-A,C-A])
         e_a,_,_=solve(aa,bb)
@@ -497,7 +497,6 @@ while t<t_all and not (math.isinf(t) or math.isnan(t)):
     if silence==1:
         break
     t=t+d_t
-
 '''
 DATA OUT
 '''
