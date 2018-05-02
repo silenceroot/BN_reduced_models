@@ -15,29 +15,29 @@ X = (1:num_x)*d_x;
 Y = (1:num_y)*d_y;
 [X, Y] = meshgrid(X, Y);
 figure(1);
-surf(X, Y, rho);
+surf(X, Y, rho(num_y:-1:1,:));
 title('rho');
 figure(2);
-surf(X, Y, p);
+surf(X, Y, p(num_y:-1:1,:));
 title('p');
 figure(3);
-surf(X, Y, u)
+surf(X, Y, u(num_y:-1:1,:))
 title('u')
 figure(4)
-surf(X, Y, v);
+surf(X, Y, v(num_y:-1:1,:));
 title('v');
 figure(5);
-surf(X, Y, phi_a);
+surf(X, Y, phi_a(num_y:-1:1,:));
 title('phi_a');
 figure(6);
-surf(X, Y, phi_b);
+surf(X, Y, phi_b(num_y:-1:1,:));
 title('phi_b');
 figure(7);
-surf(X, Y, z_a);
+surf(X, Y, z_a(num_y:-1:1,:));
 title('z_a');
 figure(8);
-surf(X, Y, z_b);
+surf(X, Y, z_b(num_y:-1:1,:));
 title('z_b');
 figure(9);
-surf(X, Y, temper);
+surf(X, Y, temper(num_y:-1:1,:));
 title('temper');
